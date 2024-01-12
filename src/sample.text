@@ -1,0 +1,101 @@
+import React, { useRef, useEffect, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import './Map.css';
+
+mapboxgl.accessToken =
+  'pk.eyJ1IjoidmVnYWlubm92YXRpb25zIiwiYSI6ImNsbTV3c3hwZDA4ZDgzcGxna2IxbDZtNXMifQ.eVpetpE1_nHx3K-LRMPb0g';
+
+const Map = () => {
+  const mapContainerRef = useRef(null);
+  const [lng, setLng] = useState(null);
+  const [lat, setLat] = useState(null);
+  const [zoom, setZoom] = useState(4);
+
+  useEffect(() => {
+    const fetchData = async () => {
+  try {
+    const response = await fetch('http://localhost:3001/data');
+    const serverData = await response.json();
+
+    if (serverData && serverData.latitude && serverData.longitude) {
+      setLng(serverData.longitude);
+      setLat(serverData.latitude);
+    }
+  } catch (error) {
+    console.error('Error fetching data from server:', error);
+  }
+};
+
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/vegainnovations/cln9zh9ld03h701pb7jxcdbr1',
+      zoom: 2,
+      center: [80.7718, 7.8731],
+      attributionControl: false,
+    });
+
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    const geolocate = new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+    });
+    map.addControl(geolocate);
+
+    const setMapToUserLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const userLng = position.coords.longitude;
+          const userLat = position.coords.latitude;
+
+          setLng(userLng);
+          setLat(userLat);
+
+          map.setCenter([userLng, userLat]);
+        });
+      }
+    };
+
+    setMapToUserLocation();
+    fetchData();
+
+    map.on('move', () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(0));
+    });
+
+    // Add the Mapbox Geocoder control
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+    });
+
+    map.addControl(geocoder, 'top-left');
+
+    return () => map.remove();
+  }, []);
+
+  return (
+    <div>
+      <div className="sidebarStyle">
+        <div>
+          <div>
+          <p>Longitude: {lng}</p>
+          <p>Latitude: {lat}</p>
+        </div>
+        </div>
+      </div>
+      <div className="map-container" ref={mapContainerRef} />
+    </div>
+  );
+};
+
+export default Map;
+
+
+79.8616 6.9301
