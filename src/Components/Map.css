@@ -1,13 +1,9 @@
-
-
-
 .map-container {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-
 }
 
 /* .sidebarStyle {
@@ -29,14 +25,10 @@
   height: 32px;
   transform-origin: center center;
   /* transition: transform 0.1s;  */
-  
-
-
 }
-.map{
+.map {
   transition: transform 0.1s ease;
 }
-
 
 .text-paragraph {
   position: fixed;
@@ -68,11 +60,10 @@
 }
 
 .marker {
-  transition: transform 0.1s ease; 
+  transition: transform 0.1s ease;
   will-change: transform, opacity;
   opacity: 1;
 }
-
 
 /* .sidebarStyle-exit {
   position: absolute;
